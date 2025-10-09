@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo L'bel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://mozilla.github.io/pdf.js/build/pdf.mjs" type="module"></script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #1d2b3a, #121212);
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 15px 0;
+            flex-shrink: 0;
+        }
+        
+        #top-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 15px;
+            flex-shrink: 0;
+            width: 100%;
+            gap: 20px;
+        }
+        
+        .control-button {
+            text-decoration: none;
+            color: white;
+            font-size: 0.9em;
+            font-weight: 700;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Color de marca L'bel */
+        .back-button { background-color: #b79a6a; } 
+        .download-btn { background-color: #4CAF50; }
+
+        .control-button:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+
+        .download-btn svg {
+            width: 18px; height: 18px; fill: white;
+        }
+
+        #viewer-container {
+            width: 100%;
+            height: 100%;
+            overflow-x: scroll;
+            overflow-y: hidden;
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        #pdf-pages-container {
+            display: flex;
+        }
+
+        .pdf-page {
+            position: relative;
+            flex-shrink: 0;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            margin: 0 8px;
+        }
+
+        .pdf-page canvas {
+            display: block;
+            height: 100%;
+            width: 100%;
+            border-radius: 5px;
+        }
+
+        /* Color de marca L'bel para scrollbar */
+        #viewer-container::-webkit-scrollbar { height: 12px; }
+        #viewer-container::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 10px; }
+        #viewer-container::-webkit-scrollbar-thumb { background-color: #b79a6a; border-radius: 10px; border: 3px solid transparent; background-clip: content-box; }
+        #viewer-container::-webkit-scrollbar-thumb:hover { background-color: #d4b88b; }
+    </style>
+</head>
+<body>
+
+    <h1>Catálogo L'bel</h1>
+
+    <div id="top-controls">
+        <a href="index.html" class="control-button back-button">← Volver al inicio</a>
+        <a href="lbel.pdf" download="Catalogo_Lbel.pdf" class="control-button download-btn" title="Descargar PDF">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13v4h-10v-4H5l7-7 7 7h-2z"/></svg>
+            <span>Descargar</span>
+        </a>
+    </div>
+
+    <div id="viewer-container">
+        <div id="pdf-pages-container"></div>
+    </div>
+
+    <script type="module">
+        const QUALITY_FACTOR = 3; 
+
+        // Cambio del nombre del archivo PDF
+        const url = 'lbel.pdf'; 
+
+        const { pdfjsLib } = globalThis;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `//mozilla.github.io/pdf.js/build/pdf.worker.mjs`;
+
+        const viewerContainer = document.getElementById('viewer-container');
+        const pagesContainer = document.getElementById('pdf-pages-container');
+        const renderedPages = new Set();
+        let pdfDoc = null;
+
+        async function setupPages(pdfDoc, fitScale, renderScale) {
+            const numPages = pdfDoc.numPages;
+            const fragment = document.createDocumentFragment();
+
+            for (let i = 1; i <= numPages; i++) {
+                const page = await pdfDoc.getPage(i);
+                
+                const displayViewport = page.getViewport({ scale: fitScale });
+                const renderViewport = page.getViewport({ scale: renderScale });
+
+                const pageDiv = document.createElement('div');
+                pageDiv.className = 'pdf-page';
+                pageDiv.dataset.pageNumber = i;
+                pageDiv.style.width = `${displayViewport.width}px`;
+                pageDiv.style.height = `${displayViewport.height}px`;
+
+                const canvas = document.createElement('canvas');
+                canvas.width = renderViewport.width;
+                canvas.height = renderViewport.height;
+
+                pagesContainer.style.height = `${displayViewport.height}px`;
+                pageDiv.appendChild(canvas);
+                fragment.appendChild(pageDiv);
+            }
+            pagesContainer.appendChild(fragment);
+        }
+
+        function renderVisiblePages(renderScale) {
+            const pageDivs = document.querySelectorAll('.pdf-page');
+            const containerRect = viewerContainer.getBoundingClientRect();
+            pageDivs.forEach(pageDiv => {
+                const pageRect = pageDiv.getBoundingClientRect();
+                const pageNumber = parseInt(pageDiv.dataset.pageNumber, 10);
+                const isVisible = pageRect.left < containerRect.right && pageRect.right > containerRect.left;
+                if (isVisible && !renderedPages.has(pageNumber)) {
+                    renderedPages.add(pageNumber);
+                    pdfDoc.getPage(pageNumber).then(page => {
+                        const canvas = pageDiv.querySelector('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const viewport = page.getViewport({ scale: renderScale });
+                        const renderContext = { canvasContext: ctx, viewport };
+                        page.render(renderContext);
+                    });
+                }
+            });
+        }
+
+        pdfjsLib.getDocument(url).promise.then(async doc => {
+            pdfDoc = doc;
+            const firstPage = await pdfDoc.getPage(1);
+            const unscaledViewport = firstPage.getViewport({ scale: 1 });
+            
+            const availableHeight = viewerContainer.clientHeight - 20;
+            const availableWidth = viewerContainer.clientWidth - 20;
+            const scaleToFitHeight = availableHeight / unscaledViewport.height;
+            const scaleToFitWidth = availableWidth / unscaledViewport.width;
+            const fitScale = Math.min(scaleToFitHeight, scaleToFitWidth);
+            
+            const renderScale = fitScale * QUALITY_FACTOR;
+
+            await setupPages(pdfDoc, fitScale, renderScale);
+            renderVisiblePages(renderScale);
+            viewerContainer.addEventListener('scroll', () => renderVisiblePages(renderScale)); 
+        }).catch(err => {
+            console.error('Error al cargar el PDF:', err);
+            alert('No se pudo cargar el archivo PDF.');
+        });
+    </script>
+
+</body>
+</html>

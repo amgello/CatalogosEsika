@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo Online</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos generales del cuerpo de la página en MODO OSCURO */
+        body {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            /* Fondo oscuro con un degradado sutil */
+            background: linear-gradient(135deg, #1d2b3a, #121212);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #e0e0e0; /* Color de texto claro por defecto */
+        }
+
+        /* Contenedor principal en MODO OSCURO */
+        .container {
+            text-align: center;
+            /* Un fondo un poco más claro que el body para generar contraste */
+            background-color: rgba(44, 44, 52, 0.85); 
+            padding: 40px 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #ffffff; /* Título en color blanco para máxima legibilidad */
+        }
+
+        /* Contenedor de los botones */
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* Espacio entre los botones */
+        }
+
+        /* Estilo base de los botones */
+        .brand-button {
+            text-decoration: none;
+            color: white;
+            font-size: 1.2em;
+            font-weight: 700;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            /* Sombra más sutil y adaptada al fondo oscuro */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Efecto al pasar el cursor sobre los botones */
+        .brand-button:hover {
+            transform: translateY(-5px); /* Eleva el botón */
+            /* Sombra más pronunciada en hover */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            filter: brightness(1.1); /* Hace el botón un poco más brillante */
+        }
+
+        /* Colores específicos para cada marca */
+        .esika {
+            background-color: #d92d78;
+        }
+
+        .lbel {
+            background-color: #b79a6a;
+        }
+
+        .cyzone {
+            background-color: #7d3c98;
+        }
+
+        /* Media query para hacer el diseño adaptable a pantallas más pequeñas */
+        @media (min-width: 768px) {
+            .button-container {
+                flex-direction: row; /* Botones en fila en pantallas grandes */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Catálogo Online</h1>
+        <div class="button-container">
+            <a href="esika.html" class="brand-button esika">Ésika</a>
+            <a href="lbel.html" class="brand-button lbel">L'bel</a>
+            <a href="cyzone.html" class="brand-button cyzone">CyZone</a>
+        </div>
+    </div>
+</body>
+</html>
