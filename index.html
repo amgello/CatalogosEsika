@@ -80,13 +80,21 @@
         }
 
         .cyzone {
-            background-color: #7d3c98;
+            /* Usamos el nuevo color fucsia que elegiste */
+            background-color: #D1136D; 
+        }
+
+        /* --- NUEVO COLOR PARA GANA --- */
+        .gana {
+            background-color: #E74C3C; /* Un rojo vibrante y moderno */
         }
 
         /* Media query para hacer el diseño adaptable a pantallas más pequeñas */
         @media (min-width: 768px) {
             .button-container {
                 flex-direction: row; /* Botones en fila en pantallas grandes */
+                flex-wrap: wrap; /* Permite que los botones pasen a la siguiente línea si no caben */
+                justify-content: center;
             }
         }
     </style>
@@ -95,9 +103,11 @@
     <div class="container">
         <h1>Catálogo Online</h1>
         <div class="button-container">
+            <a href="gana.html" class="brand-button gana">Gana</a>
             <a href="esika.html" class="brand-button esika">Ésika</a>
             <a href="lbel.html" class="brand-button lbel">L'bel</a>
             <a href="cyzone.html" class="brand-button cyzone">CyZone</a>
+            
         </div>
     </div>
 </body>
